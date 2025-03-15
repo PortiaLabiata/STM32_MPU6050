@@ -6,7 +6,7 @@
 
 #define CLI_UART huart1
 #define MAXLINE 1024
-#define CMDS 1
+#define CMDS 20
 #define MAXARGS 100
 #define DELIMITER " "
 

@@ -15,11 +15,6 @@ int main(void)
 
     CLI_AddCommand("getreg", getreg_Handler);
     CLI_AddCommand("setreg", setreg_Handler);
-    uint8_t pData;
-    char str[20];
-    MPU6050_ReadRegister_I2C(&hi2c1, WHO_AM_I, (uint8_t*)&pData);
-    sprintf(str, "%d\n", (int)pData);
-    println(str);
 
     while (1) {
         CLI_ProcessCommand();

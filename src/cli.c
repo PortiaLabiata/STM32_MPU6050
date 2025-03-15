@@ -1,16 +1,15 @@
 #include "cli.h"
 
 static CLI_Cmd_t __cmds[CMDS];
-static uint32_t __cmds_num = 0;
+static uint32_t __cmds_number = 0;
 
 /* System functions */
 
 void CLI_AddCommand(char *cmd, void (*fun)(char *argv[]))
 {
-    CLI_Cmd_t command_struct;
-    command_struct.cmd = cmd;
-    command_struct.fun = fun;
-    __cmds[__cmds_num++] = command_struct;
+    __cmds[__cmds_number].cmd = cmd;
+    __cmds[__cmds_number].fun = fun;
+    __cmds_number++;
 }
 
 void CLI_ProcessCommand(void)
@@ -22,7 +21,7 @@ void CLI_ProcessCommand(void)
     argv[argc++] = strtok(line, DELIMITER);
     while ((argv[argc++] = strtok(NULL, DELIMITER)) != NULL && argc <= MAXARGS) ;
 
-    for (int i = 0; i < CMDS; i++) {
+    for (int i = 0; i <= __cmds_number && i < CMDS; i++) {
         if (strcmp(__cmds[i].cmd, argv[0]) == 0) {
             __cmds[i].fun(argv);
             return;
