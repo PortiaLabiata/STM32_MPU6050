@@ -1,5 +1,4 @@
-#ifndef MAIN_H_
-#define MAIN_H_
+#pragma once
 
 #include <stm32f1xx.h>
 #include <stm32f1xx_hal.h>
@@ -33,7 +32,3 @@ extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart1;
 
 /* User functions */
-
-
-
-#endif

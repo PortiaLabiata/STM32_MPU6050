@@ -107,3 +107,8 @@ void HAL_UART_MspInit(UART_HandleTypeDef* huart)
         HAL_NVIC_EnableIRQ(USART1_IRQn);
     }
 }
+
+void HAL_MspInit(void)
+{
+    HAL_NVIC_SetPriority(SysTick_IRQn, 15, 15);
+}

@@ -6,7 +6,8 @@
 
 /* Low-level I2C functions */
 
-MPU_Status_t MPU6050_WriteRegister_I2C(I2C_HandleTypeDef *hi2c, \
+MPU_Status_t MPU_WriteRegister_I2C(I2C_HandleTypeDef *hi2c, \
     uint8_t register_addr, uint8_t value);
 
-MPU_Status_t MPU6050_ReadRegister_I2C(I2C_HandleTypeDef *hi2c, uint8_t register_addr, uint8_t *pData);
+MPU_Status_t MPU_ReadRegister_I2C(I2C_HandleTypeDef *hi2c, \
+    uint8_t register_addr, uint8_t *pData);

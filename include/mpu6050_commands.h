@@ -1,10 +1,9 @@
 #pragma once
 #include "main.h"
-#include "cli.h"
 
 #include <stdlib.h>
 
 /* Command handlers */
 
-void getreg_Handler(char *argv[]);
-void setreg_Handler(char *argv[]);
+CLI_Status_t getreg_Handler(int argc, char *argv[]);
+CLI_Status_t setreg_Handler(int argc, char *argv[]);

@@ -13,10 +13,14 @@ int main(void)
     UART1_Config();
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
 
-    CLI_AddCommand("getreg", getreg_Handler);
-    CLI_AddCommand("setreg", setreg_Handler);
+    CLI_Init(&huart1);
+    CLI_AddCommand("getreg", &getreg_Handler, "Usage: getreg <address>, reads value stored in address");
+    CLI_AddCommand("setreg", &setreg_Handler, "Usage: setreg <address> <value>, writes value to address");
+    CLI_Log(__FILE__, "Peripherals configured, all ready.");
 
     while (1) {
-        CLI_ProcessCommand();
+        if (CLI_RUN() != CLI_OK) {
+            CLI_Log(__func__, "CLI command runtime error.");
+        }
     }
 }
