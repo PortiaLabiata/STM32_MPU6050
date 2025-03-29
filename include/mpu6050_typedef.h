@@ -8,19 +8,27 @@ typedef enum {
 } MPU_Status_t;
 
 typedef enum {
-    MPU_CLKS_INT,
-    MPU_CLKS_PLLX,
-    MPU_CLKS_PLLY,
-    MPU_CLKS_PLLZ,
-    MPU_CLKS_EXT32K,
-    MPU_CLKS_EXT19M
+    MPU_CLKS_INT = 0,
+    MPU_CLKS_PLLX = 1,
+    MPU_CLKS_PLLY = 2,
+    MPU_CLKS_PLLZ = 3,
+    MPU_CLKS_EXT32K = 4,
+    MPU_CLKS_EXT19M = 5,
+    MPU_CLKS_DISABLE = 7
 } MPU_ClockSource_t;
+
+typedef enum {
+    MPU_MOD_ON = 1,
+    MPU_MOD_OFF = 0
+} MPU_ModuleState_t;
 
 /* TODO: добавить power management */
 
 typedef struct {
     I2C_HandleTypeDef *hi2c;
     MPU_ClockSource_t clock_source;
+    MPU_ModuleState_t temp_enable;
+    MPU_ModuleState_t cycle;
 } MPU_Handle_I2C_t;
 
 typedef enum {

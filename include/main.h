@@ -31,4 +31,6 @@ extern GPIO_InitTypeDef GPIO_InitStruc;
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart1;
 
+extern CLI_Context_t ctx;
+
 /* User functions */
