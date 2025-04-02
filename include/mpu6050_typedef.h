@@ -60,5 +60,6 @@ typedef enum {
     SMPLRT_DIV = 0x19,
 
     PWR_MGMT_1 = 0x6B,
-    PWR_MGMT_2 = 0x6C
+    PWR_MGMT_2 = 0x6C,
+    USER_CTRL = 0x6A
 } MPU_Register_t;

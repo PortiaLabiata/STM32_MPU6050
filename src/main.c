@@ -28,7 +28,7 @@ int main(void)
     mpu.sample_rate_div = 0;
     mpu.hi2c = &hi2c1;
     mpu.gyro_range = 0;
-    mpu.acccel_range = 0;
+    mpu.acccel_range = 3;
     mpu.clock_source = MPU_CLKS_INT;
     mpu.cycle = MPU_MOD_OFF;
     MPU_Init(&mpu);

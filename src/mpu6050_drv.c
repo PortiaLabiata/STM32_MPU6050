@@ -2,6 +2,11 @@
 
 /* Service functions */
 
+/**
+ * \brief Converts MPU statuses into readable messages, i. e. for CLI.
+ * \param[in] status Status.
+ * \returns Message.
+ */
 char *MPU_Error2Str(MPU_Status_t status)
 {
     switch (status) {
@@ -45,22 +50,46 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
 }
 
 /* High-level control functions */
-
-MPU_Status_t MPU_Start(MPU_Handle_I2C_t *handle)
-{
-    return MPU_STATUS_OK;
-}
-
+/**
+ * \brief Enables FIFO operations in general, to enable putting data into FIFO call 
+ * MPU_Enable<Accel/Gyro>2FIFO.
+ * \param[in] handle MPU sensor handle.
+ * \returns Operation status.
+ */
 MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle)
 {
-    return MPU_STATUS_OK;
+    return MPU_WriteRegister_I2C(handle->hi2c, USER_CTRL, 1 << 6);
 }
 
+/**
+ * \brief Sets sensor's acceleration range to the one in handle's field.
+ * \details Values are mapped that way:
+ * | Value in field | Range |
+ * | -------------- | ----- |
+ * | 0              | +-2g  |
+ * | 1              | +-4g  |
+ * | 2              | +-8g  |
+ * | 3              | +-16g |
+ * \param[in] handle MPU sensor handle.
+ * \returns Operation status.
+ */
 MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle)
 {
     return MPU_WriteRegister_I2C(handle->hi2c, ACCEL_CONFIG, handle->acccel_range << 3);
 }
 
+/**
+ * \brief Sets sensor's gyroscope range to the one in handle's field.
+ * \details Values are mapped that way:
+ * | Value in field | Range |
+ * | -------------- | ----- |
+ * | 0              | +-250 deg/sec  |
+ * | 1              | +-500 deg/sec  |
+ * | 2              | +-1000 deg/sec |
+ * | 3              | +-2000 deg/sec |
+ * \param[in] handle MPU sensor handle.
+ * \returns Operation status.
+ */
 MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
 {
     return MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, handle->gyro_range << 3);
