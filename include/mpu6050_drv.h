@@ -23,6 +23,8 @@ MPU_Status_t MPU_ReadBytes_I2C(I2C_HandleTypeDef *hi2c, \
 
 MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle);
 
+MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle);
+
 MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle);
 MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle);
 

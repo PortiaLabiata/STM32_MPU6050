@@ -24,13 +24,20 @@ int main(void)
     CLI_AddCommand(&ctx, "setreg", &setreg_Handler, "Usage: setreg <address> <value>, writes value to address");
     CLI_Log(&ctx, __FILE__, "Peripherals configured, all ready.");
 
-    mpu.temp_enable = MPU_MOD_OFF;
+    mpu.temp_enable = MPU_OFF;
     mpu.sample_rate_div = 0;
     mpu.hi2c = &hi2c1;
     mpu.gyro_range = 0;
     mpu.acccel_range = 3;
     mpu.clock_source = MPU_CLKS_INT;
-    mpu.cycle = MPU_MOD_OFF;
+    mpu.cycle = MPU_OFF;
+
+    mpu.enable_fifo = MPU_ON;
+    mpu.accel_fifo = MPU_ON;
+    mpu.gyrox_fifo = MPU_OFF;
+    mpu.gyroy_fifo = MPU_OFF;
+    mpu.gyroz_fifo = MPU_OFF;
+    mpu.temp_fifo = MPU_OFF;
     MPU_Init(&mpu);
     
     while (1) {
@@ -45,6 +52,6 @@ int main(void)
 void loop(void)
 {
     int16_t x, y, z;
-    MPU_ReadGyro_Raw(&mpu, &x, &y, &z);
+    MPU_ReadAccel_Raw(&mpu, &x, &y, &z);
     printf("%d, %d, %d\n", x, y, z);
 }

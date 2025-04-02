@@ -46,10 +46,26 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
     status = MPU_SetGyroRange(handle);
     printf("Setting gyro range: %s\n", MPU_Error2Str(status));
 
+    status = MPU_EnableFIFO(handle);
+    printf("(Maybe) enabling FIFO: %s\n", MPU_Error2Str(status));
+
     return MPU_STATUS_OK;
 }
 
 /* High-level control functions */
+
+/**
+ * \brief Enables FIFO writing for modules, selected in handle.
+ * \param[in] handle MPU sensor handle.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_EnableFIFO_Writing(MPU_Handle_I2C_t *handle)
+{
+    return MPU_WriteRegister_I2C(handle->hi2c, FIFO_EN, \
+        (handle->accel_fifo << 3) | (handle->gyroz_fifo << 4) | \
+        (handle->gyroy_fifo << 5) | (handle->gyrox_fifo << 6) | (handle->temp_fifo << 7));
+}
+
 /**
  * \brief Enables FIFO operations in general, to enable putting data into FIFO call 
  * MPU_Enable<Accel/Gyro>2FIFO.
@@ -105,10 +121,10 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
  */
 MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -120,10 +136,10 @@ MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_YOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_YOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -135,10 +151,10 @@ MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadAccelZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_ZOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_ZOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -156,9 +172,9 @@ MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
     uint8_t buffer[6];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
-    *x = (buffer[0] << 8) | buffer[1];
-    *y = (buffer[2] << 8) | buffer[3];
-    *z = (buffer[4] << 8) | buffer[5];
+    *x = ((int16_t)buffer[0] << 8) | buffer[1];
+    *y = ((int16_t)buffer[2] << 8) | buffer[3];
+    *z = ((int16_t)buffer[4] << 8) | buffer[5];
     return MPU_STATUS_OK;
 }
 
@@ -172,10 +188,10 @@ MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
  */
 MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -187,10 +203,10 @@ MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_YOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_YOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -202,10 +218,10 @@ MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t buffer[2];
-    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_ZOUT_H, 2, buffer);
+    uint8_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_ZOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
-    *pData = (buffer[0] << 8) | buffer[1];
+    *pData = ((int16_t)buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
@@ -223,9 +239,9 @@ MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, \
     uint8_t buffer[6];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
-    *x = (buffer[0] << 8) | buffer[1];
-    *y = (buffer[2] << 8) | buffer[3];
-    *z = (buffer[4] << 8) | buffer[5];
+    *x = ((int16_t)buffer[0] << 8) | buffer[1];
+    *y = ((int16_t)buffer[2] << 8) | buffer[3];
+    *z = ((int16_t)buffer[4] << 8) | buffer[5];
     return MPU_STATUS_OK;
 }
 

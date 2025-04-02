@@ -18,8 +18,8 @@ typedef enum {
 } MPU_ClockSource_t;
 
 typedef enum {
-    MPU_MOD_ON = 1,
-    MPU_MOD_OFF = 0
+    MPU_ON = 1,
+    MPU_OFF = 0
 } MPU_ModuleState_t;
 
 /* TODO: добавить power management */
@@ -33,6 +33,13 @@ typedef struct {
 
     uint8_t acccel_range;
     uint8_t gyro_range;
+
+    MPU_ModuleState_t accel_fifo;
+    MPU_ModuleState_t gyrox_fifo;
+    MPU_ModuleState_t gyroy_fifo;
+    MPU_ModuleState_t gyroz_fifo;
+    MPU_ModuleState_t temp_fifo;
+    MPU_ModuleState_t enable_fifo;
 } MPU_Handle_I2C_t;
 
 typedef enum {
@@ -58,6 +65,7 @@ typedef enum {
     GYRO_CONFIG = 0x1B,
     ACCEL_CONFIG = 0x1C,
     SMPLRT_DIV = 0x19,
+    FIFO_EN = 0x23,
 
     PWR_MGMT_1 = 0x6B,
     PWR_MGMT_2 = 0x6C,
