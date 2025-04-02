@@ -66,6 +66,47 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
     return MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, handle->gyro_range << 3);
 }
 
+
+/**
+ * \brief Reads raw acceleration across X axis.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t output = 0;
+    uint8_t value = 0;
+    MPU_Status_t status;
+
+    status = MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_L, &value);
+    if (status != MPU_STATUS_OK) return status;
+
+    output += value;
+    status = MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_H, &value);
+    if (status != MPU_STATUS_OK) return status;
+
+    output += value << 8;
+    *pData = output;
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads acceleration across X axis in gs.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_ReadAccelX(MPU_Handle_I2C_t *handle, float *pData)
+{
+    int16_t reading;
+    MPU_Status_t status = MPU_ReadAccelX_Raw(handle, &reading);
+    if (status != MPU_STATUS_OK) return status;
+
+    *pData = (float)reading / INT8_MAX * (float)(1 << handle->acccel_range);
+    return MPU_STATUS_OK;
+}
+
 /* Low-level I2C functions */
 
 MPU_Status_t MPU_WriteRegister_I2C(I2C_HandleTypeDef *hi2c, \

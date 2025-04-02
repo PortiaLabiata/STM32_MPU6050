@@ -2,7 +2,11 @@
 #include "main.h"
 
 #include "mpu6050_typedef.h"
-#include "mpu6050_const.h"
+#include "mpu6050_const.h" 
+
+/* Magic numbers */
+
+//#define INT8_MAX 32767
 
 /* Low-level I2C functions */
 
