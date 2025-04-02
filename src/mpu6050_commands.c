@@ -5,16 +5,18 @@
 CLI_Status_t setreg_Handler(int argc, char *argv[])
 {
     if (argc < 2) return CLI_ERROR_ARG;
+    errno = 0;
     uint8_t reg = strtol(argv[1], NULL, 16);
     uint8_t val = strtol(argv[2], NULL, 2);
     if (errno != 0) return CLI_ERROR_ARG;
-    
+
     if (MPU_WriteRegister_I2C(&hi2c1, reg, val) != MPU_STATUS_OK) return CLI_ERROR;
     else return CLI_OK;
 }
 
 CLI_Status_t getreg_Handler(int argc, char *argv[])
 {
+    errno = 0;
     if (argc < 2) return CLI_ERROR_ARG;
     uint8_t reg = strtol(argv[1], NULL, 16);
     if (errno != 0) return CLI_ERROR_ARG;

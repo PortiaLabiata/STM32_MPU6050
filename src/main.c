@@ -21,9 +21,27 @@ int main(void)
     CLI_Log(&ctx, __FILE__, "Peripherals configured, all ready.");
 
     CLI_Status_t status = CLI_OK;
+    MPU_WriteRegister_I2C(&hi2c1, PWR_MGMT_1, 0);
+    MPU_WriteRegister_I2C(&hi2c1, ACCEL_CONFIG, 3 << 3);
+    int16_t output = 0;
+    uint8_t value = 0;
+
+    /* MPU_Handle_I2C_t mpu;
+    mpu.temp_enable = MPU_MOD_OFF;
+    mpu.sample_rate_div = 0;
+    mpu.hi2c = &hi2c1;
+    mpu.gyro_range = 3;
+    mpu.acccel_range = 3;
+    mpu.clock_source = MPU_CLKS_INT;
+    mpu.cycle = MPU_MOD_OFF;
+    MPU_Init(&mpu); */
     while (1) {
-        if ((status = CLI_RUN(&ctx)) != CLI_OK) {
-            CLI_Log(&ctx, __func__, CLI_Status2Str(status));
-        }
+        //CLI_RUN(&ctx);
+        MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_L, &value);
+        output += value;
+        MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_H, &value);
+        output += value << 8;
+        printf("%d\n", output);
+        output = 0;
     }
 }
