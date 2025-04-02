@@ -31,7 +31,7 @@ typedef struct {
     MPU_ModuleState_t cycle;
     uint8_t sample_rate_div;
 
-    uint8_t acccel_range; // In gs
+    uint8_t acccel_range;
     uint8_t gyro_range;
 } MPU_Handle_I2C_t;
 

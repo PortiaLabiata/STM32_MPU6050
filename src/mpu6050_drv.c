@@ -66,6 +66,7 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
     return MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, handle->gyro_range << 3);
 }
 
+/* Reading data */
 
 /**
  * \brief Reads raw acceleration across X axis.
@@ -75,35 +76,60 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
  */
 MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
-    int16_t output = 0;
-    uint8_t value = 0;
-    MPU_Status_t status;
-
-    status = MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_L, &value);
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 2, buffer);
     if (status != MPU_STATUS_OK) return status;
-
-    output += value;
-    status = MPU_ReadRegister_I2C(&hi2c1, ACCEL_XOUT_H, &value);
-    if (status != MPU_STATUS_OK) return status;
-
-    output += value << 8;
-    *pData = output;
+    *pData = (buffer[0] << 8) | buffer[1];
     return MPU_STATUS_OK;
 }
 
 /**
- * \brief Reads acceleration across X axis in gs.
+ * \brief Reads raw acceleration across Y axis.
  * \param[in] handle MPU sensor handle.
  * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_YOUT_H, 2, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *pData = (buffer[0] << 8) | buffer[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads raw acceleration across Z axis.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadAccelZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_ZOUT_H, 2, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *pData = (buffer[0] << 8) | buffer[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads raw acceleration values across all axes.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] x Pointer to X output value.
+ * \param[out] y Pointer to Y output value.
+ * \param[out] z Pointer to Z output value.
  * \returns Operation status.
  */
-MPU_Status_t MPU_ReadAccelX(MPU_Handle_I2C_t *handle, float *pData)
+MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
+    int16_t *x, int16_t *y, int16_t *z)
 {
-    int16_t reading;
-    MPU_Status_t status = MPU_ReadAccelX_Raw(handle, &reading);
+    uint8_t buffer[6];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
-
-    *pData = (float)reading / INT8_MAX * (float)(1 << handle->acccel_range);
+    *x = (buffer[0] << 8) | buffer[1];
+    *y = (buffer[2] << 8) | buffer[3];
+    *z = (buffer[4] << 8) | buffer[5];
     return MPU_STATUS_OK;
 }
 
@@ -133,4 +159,18 @@ MPU_Status_t MPU_ReadRegister_I2C(I2C_HandleTypeDef *hi2c, MPU_Register_t regist
             return MPU_STATUS_I2C_ERROR;
     }
     return MPU_STATUS_OK;
+}
+
+MPU_Status_t MPU_ReadBytes_I2C(I2C_HandleTypeDef *hi2c, MPU_Register_t register_addr, \
+    uint32_t bytes, uint8_t *pData)
+{
+    if (HAL_I2C_Master_Transmit(hi2c, MPU6050_I2C_ADDRESS, \
+        (uint8_t*)&register_addr, 1, MPU_TIMEOUT) != HAL_OK) {
+           return MPU_STATUS_I2C_ERROR;
+   }
+   if (HAL_I2C_Master_Receive(hi2c, MPU6050_I2C_ADDRESS, \
+       (uint8_t*)pData, bytes, MPU_TIMEOUT) != HAL_OK) {
+           return MPU_STATUS_I2C_ERROR;
+   }
+   return MPU_STATUS_OK;
 }
