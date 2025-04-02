@@ -31,5 +31,9 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle);
 MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
 MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
 MPU_Status_t MPU_ReadAccelZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
-
 MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, int16_t *x, int16_t *y, int16_t *z);
+
+MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
+MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
+MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
+MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, int16_t *x, int16_t *y, int16_t *z);

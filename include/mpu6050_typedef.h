@@ -44,6 +44,13 @@ typedef enum {
     ACCEL_ZOUT_H = 0x3F,
     ACCEL_ZOUT_L = 0x40,
 
+    GYRO_XOUT_H = 0x43,
+    GYRO_XOUT_L = 0x44,
+    GYRO_YOUT_H = 0x45,
+    GYRO_YOUT_L = 0x46,
+    GYRO_ZOUT_H = 0x47,
+    GYRO_ZOUT_L = 0x48,
+
     TEMP_OUT_H = 0x41,
     TEMP_OUT_L = 0x42,
 

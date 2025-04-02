@@ -66,7 +66,7 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
     return MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, handle->gyro_range << 3);
 }
 
-/* Reading data */
+/* Reading accel data */
 
 /**
  * \brief Reads raw acceleration across X axis.
@@ -126,6 +126,73 @@ MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
 {
     uint8_t buffer[6];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 6, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *x = (buffer[0] << 8) | buffer[1];
+    *y = (buffer[2] << 8) | buffer[3];
+    *z = (buffer[4] << 8) | buffer[5];
+    return MPU_STATUS_OK;
+}
+
+/* Reading gyro data */
+
+/**
+ * \brief Reads raw gyroscope data across X axis.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 2, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *pData = (buffer[0] << 8) | buffer[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads raw gyroscope data across Y axis.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_YOUT_H, 2, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *pData = (buffer[0] << 8) | buffer[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads raw gyroscope data across Z axis.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] pData Pointer to output value.
+ * \returns Operation status. 
+ */
+MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
+{
+    int16_t buffer[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_ZOUT_H, 2, buffer);
+    if (status != MPU_STATUS_OK) return status;
+    *pData = (buffer[0] << 8) | buffer[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads raw gyroscope data values across all axes.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] x Pointer to X output value.
+ * \param[out] y Pointer to Y output value.
+ * \param[out] z Pointer to Z output value.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, \
+    int16_t *x, int16_t *y, int16_t *z)
+{
+    uint8_t buffer[6];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
     *x = (buffer[0] << 8) | buffer[1];
     *y = (buffer[2] << 8) | buffer[3];
