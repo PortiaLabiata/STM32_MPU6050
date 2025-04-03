@@ -20,8 +20,6 @@ int main(void)
 
     CLI_Status_t status = CLI_OK;
     CLI_Init(&ctx, &huart1);
-    CLI_AddCommand(&ctx, "getreg", &getreg_Handler, "Usage: getreg <address>, reads value stored in address");
-    CLI_AddCommand(&ctx, "setreg", &setreg_Handler, "Usage: setreg <address> <value>, writes value to address");
     CLI_Log(&ctx, __FILE__, "Peripherals configured, all ready.");
 
     mpu.temp_enable = MPU_OFF;
@@ -39,6 +37,8 @@ int main(void)
     mpu.gyroz_fifo = MPU_OFF;
     mpu.temp_fifo = MPU_OFF;
     MPU_Init(&mpu);
+
+    MPU_SetClockSource(&mpu, MPU_CLKS_PLLX);
     
     while (1) {
         status = CLI_RUN(&ctx, loop);

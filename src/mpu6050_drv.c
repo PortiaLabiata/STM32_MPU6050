@@ -29,7 +29,12 @@ char *MPU_Error2Str(MPU_Status_t status)
 
 MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
 {
-    CLI_Log(&ctx, __func__, "Initializing MPU6050.");
+    //CLI_Log(&ctx, __func__, "Initializing MPU6050.");
+#ifdef USE_CLI
+    CLI_AddCommand(&ctx, "getreg", &getreg_Handler, "Usage: getreg <address>, reads value stored in address");
+    CLI_AddCommand(&ctx, "setreg", &setreg_Handler, "Usage: setreg <address> <value>, writes value to address");
+#endif
+
     uint8_t value = handle->clock_source | \
                      (handle->temp_enable << 3) | \
                      (handle->cycle << 5);
@@ -53,6 +58,15 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
 }
 
 /* High-level control functions */
+
+MPU_Status_t MPU_SetClockSource(MPU_Handle_I2C_t *handle, MPU_ClockSource_t clock)
+{
+    MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, PWR_MGMT_1, \
+        clock | (handle->temp_enable << 3) | (handle->cycle << 5));
+    if (status != MPU_STATUS_OK) return status;
+    handle->clock_source = clock;
+    return MPU_STATUS_OK;
+}
 
 /**
  * \brief Enables FIFO writing for modules, selected in handle.
@@ -87,11 +101,16 @@ MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle)
  * | 2              | +-8g  |
  * | 3              | +-16g |
  * \param[in] handle MPU sensor handle.
+ * \param[in] range Accelerometer range, see table.
  * \returns Operation status.
  */
-MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle)
+MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle, uint8_t range)
 {
-    return MPU_WriteRegister_I2C(handle->hi2c, ACCEL_CONFIG, handle->acccel_range << 3);
+    MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, ACCEL_CONFIG, \
+        range << 3);
+    if (status != MPU_STATUS_OK) return status;
+    handle->acccel_range = range;
+    return MPU_STATUS_OK;
 }
 
 /**
@@ -104,11 +123,16 @@ MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle)
  * | 2              | +-1000 deg/sec |
  * | 3              | +-2000 deg/sec |
  * \param[in] handle MPU sensor handle.
+ * \param[in] range Gyroscope range, see table.
  * \returns Operation status.
  */
-MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle)
+MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle, uint8_t range)
 {
-    return MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, handle->gyro_range << 3);
+    MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, \
+        range << 3);
+    if (status != MPU_STATUS_OK) return status;
+    handle->gyro_range = range;
+    return MPU_STATUS_OK;
 }
 
 /* Reading accel data */

@@ -1,8 +1,10 @@
 #pragma once
 #include "main.h"
 
+#include "cli.h"
 #include "mpu6050_typedef.h"
 #include "mpu6050_const.h" 
+#include "mpu6050_commands.h" // For usage in other projects
 
 /* Magic numbers */
 
@@ -23,10 +25,12 @@ MPU_Status_t MPU_ReadBytes_I2C(I2C_HandleTypeDef *hi2c, \
 
 MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle);
 
+MPU_Status_t MPU_SetClockSource(MPU_Handle_I2C_t *handle, MPU_ClockSource_t clock);
+
 MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle);
 
-MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle);
-MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle);
+MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle, uint8_t range);
+MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle, uint8_t range);
 
 /* Reading data */
 

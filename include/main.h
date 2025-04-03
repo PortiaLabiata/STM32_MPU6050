@@ -15,10 +15,7 @@
 #include "configure.h"
 
 #include "mpu6050_drv.h"
-#include "mpu6050_const.h"
-#include "mpu6050_typedef.h"
 #include "cli.h"
-#include "mpu6050_commands.h"
 
 /* Magic numbers */
 
