@@ -10,6 +10,10 @@
 
 //#define INT8_MAX 32767
 
+/* Service functions */
+
+char *MPU_Error2Str(MPU_Status_t status);
+
 /* Low-level I2C functions */
 
 MPU_Status_t MPU_WriteRegister_I2C(I2C_HandleTypeDef *hi2c, \
@@ -27,8 +31,6 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle);
 
 MPU_Status_t MPU_SetClockSource(MPU_Handle_I2C_t *handle, MPU_ClockSource_t clock);
 
-MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle);
-
 MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle, uint8_t range);
 MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle, uint8_t range);
 
@@ -43,3 +45,13 @@ MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
 MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
 MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData);
 MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, int16_t *x, int16_t *y, int16_t *z);
+
+/* FIFO operations */
+
+MPU_Status_t MPU_SetFIFO(MPU_Handle_I2C_t *handle, uint8_t enable);
+MPU_Status_t MPU_SetFIFO_Writing(MPU_Handle_I2C_t *handle);
+
+MPU_Status_t MPU_DumpFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[], uint16_t *size);
+MPU_Status_t MPU_GetFIFO_Size(MPU_Handle_I2C_t *handle, uint16_t *size);
+MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[]);
+MPU_Status_t MPU_ReadFIFO_Single(MPU_Handle_I2C_t *handle, uint8_t *value);

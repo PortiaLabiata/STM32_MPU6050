@@ -78,4 +78,4 @@ To read accelerometer data, use one of the following functions:
 1. `MPU_Status_t MPU_ReadAccel<X/Y/Z>_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)` - reads raw acceleration across X/Y/Z axis.
 2. `MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, int16_t *x, int16_t *y, int16_t *z)` - reads raw values of accelerations across all three axes.
 
-To read gyroscope data, similar functions are used.
+To read gyroscope data, similar functions are used. It is also to utilize 

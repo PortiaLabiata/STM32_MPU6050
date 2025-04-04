@@ -4,7 +4,8 @@
 typedef enum {
     MPU_STATUS_OK,
     MPU_STATUS_I2C_ERROR,
-    MPU_STATUS_ERROR
+    MPU_STATUS_ERROR,
+    MPU_STATUS_DNR_ERROR
 } MPU_Status_t;
 
 typedef enum {
@@ -69,5 +70,9 @@ typedef enum {
 
     PWR_MGMT_1 = 0x6B,
     PWR_MGMT_2 = 0x6C,
-    USER_CTRL = 0x6A
+    USER_CTRL = 0x6A,
+
+    FIFO_COUNT_H = 0x72,
+    FIFO_COUNT_L = 0x73,
+    FIFO_R_W = 0x74
 } MPU_Register_t;

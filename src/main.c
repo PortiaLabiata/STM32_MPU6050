@@ -6,6 +6,8 @@ UART_HandleTypeDef huart1;
 
 CLI_Context_t ctx;
 MPU_Handle_I2C_t mpu;
+uint8_t buffer[2];
+uint16_t size;
 
 void loop(void);
 
@@ -39,6 +41,7 @@ int main(void)
     MPU_Init(&mpu);
 
     MPU_SetClockSource(&mpu, MPU_CLKS_PLLX);
+    HAL_Delay(10);
     
     while (1) {
         status = CLI_RUN(&ctx, loop);
@@ -51,7 +54,10 @@ int main(void)
 
 void loop(void)
 {
-    int16_t x, y, z;
-    MPU_ReadAccel_Raw(&mpu, &x, &y, &z);
-    printf("%d, %d, %d\n", x, y, z);
+    MPU_Status_t status = MPU_ReadFIFO(&mpu, buffer);
+    if (status != MPU_STATUS_OK) {
+        printf("%s\n", MPU_Error2Str(status));
+        CLI_Log(&ctx, __func__, "Error(");
+    }
+    
 }

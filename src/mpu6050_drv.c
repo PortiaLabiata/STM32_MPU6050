@@ -12,16 +12,14 @@ char *MPU_Error2Str(MPU_Status_t status)
     switch (status) {
         case MPU_STATUS_OK:
             return "MPU_STATUS_OK";
-            break;
         case MPU_STATUS_I2C_ERROR:
             return "MPU_STATUS_I2C_ERROR";
-            break;
         case MPU_STATUS_ERROR:
             return "MPU_STATUS_ERROR";
-            break;
+        case MPU_STATUS_DNR_ERROR:
+            return "MPU_STATUS_DNR_ERROR";
         default:
             return "Unknown status";
-            break; 
     }
 }
 
@@ -45,14 +43,17 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
     status = MPU_WriteRegister_I2C(handle->hi2c, SMPLRT_DIV, value);
     printf("Setting sample rate: %s\n", MPU_Error2Str(status));
 
-    status = MPU_SetAccelRange(handle);
+    status = MPU_SetAccelRange(handle, handle->acccel_range);
     printf("Setting accel range rate: %s\n", MPU_Error2Str(status));
 
-    status = MPU_SetGyroRange(handle);
+    status = MPU_SetGyroRange(handle, handle->gyro_range);
     printf("Setting gyro range: %s\n", MPU_Error2Str(status));
 
-    status = MPU_EnableFIFO(handle);
+    status = MPU_SetFIFO(handle, (uint8_t)handle->enable_fifo);
     printf("(Maybe) enabling FIFO: %s\n", MPU_Error2Str(status));
+
+    status = MPU_SetFIFO_Writing(handle);
+    printf("Enabling FIFO writing: %s\n", MPU_Error2Str(status));
 
     return MPU_STATUS_OK;
 }
@@ -73,7 +74,7 @@ MPU_Status_t MPU_SetClockSource(MPU_Handle_I2C_t *handle, MPU_ClockSource_t cloc
  * \param[in] handle MPU sensor handle.
  * \returns Operation status.
  */
-MPU_Status_t MPU_EnableFIFO_Writing(MPU_Handle_I2C_t *handle)
+MPU_Status_t MPU_SetFIFO_Writing(MPU_Handle_I2C_t *handle)
 {
     return MPU_WriteRegister_I2C(handle->hi2c, FIFO_EN, \
         (handle->accel_fifo << 3) | (handle->gyroz_fifo << 4) | \
@@ -84,11 +85,12 @@ MPU_Status_t MPU_EnableFIFO_Writing(MPU_Handle_I2C_t *handle)
  * \brief Enables FIFO operations in general, to enable putting data into FIFO call 
  * MPU_Enable<Accel/Gyro>2FIFO.
  * \param[in] handle MPU sensor handle.
+ * \param[in] enable 1 is enable, 0 if disable.
  * \returns Operation status.
  */
-MPU_Status_t MPU_EnableFIFO(MPU_Handle_I2C_t *handle)
+MPU_Status_t MPU_SetFIFO(MPU_Handle_I2C_t *handle, uint8_t enable)
 {
-    return MPU_WriteRegister_I2C(handle->hi2c, USER_CTRL, 1 << 6);
+    return MPU_WriteRegister_I2C(handle->hi2c, USER_CTRL, enable << 6);
 }
 
 /**
@@ -267,6 +269,81 @@ MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, \
     *y = ((int16_t)buffer[2] << 8) | buffer[3];
     *z = ((int16_t)buffer[4] << 8) | buffer[5];
     return MPU_STATUS_OK;
+}
+
+/* FIFO operations */
+
+/**
+ * \brief Dumps the entirety of FIFO buffer.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] buffer Buffer for incoming data.
+ * \param[out] size Pointer to variable, where size of incoming data will be written
+ *  (contents of FIFO_COUNT).
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_DumpFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[], uint16_t *size)
+{
+    MPU_Status_t status = MPU_GetFIFO_Size(handle, size);
+    if (status != MPU_STATUS_OK) return status;
+
+    for (int i = 0; i < *size; i++) {
+        MPU_Status_t status = MPU_ReadRegister_I2C(handle->hi2c, FIFO_R_W, &buffer[i]);
+        if (status != MPU_STATUS_OK) return status;
+    }
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads current size of data in FIFO.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] size Pointer to output variable.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_GetFIFO_Size(MPU_Handle_I2C_t *handle, uint16_t *size)
+{
+    uint8_t _size[2];
+    MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, FIFO_COUNT_H, 2, _size);
+    if (status != MPU_STATUS_OK) return status;
+    *size = (_size[0] << 8) | _size[1];
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads data from FIFO buffer. The size of data read depends on which FIFO writings
+ * are enabled.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] buffer Output buffer. It's size must be equal to accel_fifo + gyrox_fifo +
+ * gyroy_fifo + gyroz_fifo + temp_fifo or more.
+ */
+MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[])
+{
+    if (handle->enable_fifo !=  MPU_ON) return MPU_STATUS_ERROR;
+
+    uint16_t len = (uint8_t)handle->accel_fifo*6 + ((uint8_t)handle->gyrox_fifo + \
+    (uint8_t)handle->gyroy_fifo + (uint8_t)handle->gyroz_fifo + \
+    (uint8_t)handle->temp_fifo)*2;
+
+    uint16_t size = 0;
+    MPU_Status_t status = MPU_GetFIFO_Size(handle, &size);
+    if (status != MPU_STATUS_OK) return status;
+    if (size < len) return MPU_STATUS_DNR_ERROR;
+    
+    for (int i = 0; i < len; i++) {
+        status = MPU_ReadRegister_I2C(handle->hi2c, FIFO_R_W, &buffer[i]);
+        if (status != MPU_STATUS_OK) return status;
+    }
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Reads one FIFO entry. There is no check for FIFO size, because it is too long.
+ * \param[in] handle MPU sensor handle.
+ * \param[out] value Pointer to output variable.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_ReadFIFO_Single(MPU_Handle_I2C_t *handle, uint8_t *value)
+{
+    return MPU_ReadRegister_I2C(handle->hi2c, FIFO_R_W, value);
 }
 
 /* Low-level I2C functions */
