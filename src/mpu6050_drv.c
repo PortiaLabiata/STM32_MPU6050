@@ -319,9 +319,9 @@ MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[])
 {
     if (handle->enable_fifo !=  MPU_ON) return MPU_STATUS_ERROR;
 
-    uint16_t len = (uint8_t)handle->accel_fifo*6 + ((uint8_t)handle->gyrox_fifo + \
+    uint16_t len = (uint8_t)handle->accel_fifo * 6 + ((uint8_t)handle->gyrox_fifo + \
     (uint8_t)handle->gyroy_fifo + (uint8_t)handle->gyroz_fifo + \
-    (uint8_t)handle->temp_fifo)*2;
+    (uint8_t)handle->temp_fifo) * 2;
 
     uint16_t size = 0;
     MPU_Status_t status = MPU_GetFIFO_Size(handle, &size);
@@ -331,6 +331,39 @@ MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[])
     for (int i = 0; i < len; i++) {
         status = MPU_ReadRegister_I2C(handle->hi2c, FIFO_R_W, &buffer[i]);
         if (status != MPU_STATUS_OK) return status;
+    }
+    return MPU_STATUS_OK;
+}
+
+/**
+ * \brief Processes data, fetched from FIFO. Data must be already read by MPU_ReadFIFO.
+ * \param[in] handle MPU sensor handle.
+ * \param[in] buffer Incoming data.
+ * \param[out] data Output structure.
+ * \returns Operation status.
+ */
+MPU_Status_t MPU_ProcessFIFO_Data(MPU_Handle_I2C_t *handle, uint8_t buffer[], \
+    MPU_Measurement_t *data)
+{
+    uint16_t of = 0;
+    if (handle->accel_fifo == MPU_ON) {
+        data->accel_x = BUFFER_SHIFT(of);
+        data->accel_z = BUFFER_SHIFT(of);
+        data->accel_z = BUFFER_SHIFT(of);
+    }
+
+    if (handle->gyrox_fifo == MPU_ON) {
+        data->gyro_x = BUFFER_SHIFT(of);
+    }
+    if (handle->gyroy_fifo == MPU_ON) {
+        data->gyro_y = BUFFER_SHIFT(of);
+    }
+    if (handle->gyroz_fifo == MPU_ON) {
+        data->gyro_z = BUFFER_SHIFT(of);
+    }
+
+    if (handle->temp_fifo == MPU_ON) {
+        data->temp = BUFFER_SHIFT(of);
     }
     return MPU_STATUS_OK;
 }

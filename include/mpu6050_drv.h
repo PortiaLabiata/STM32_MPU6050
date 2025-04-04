@@ -10,6 +10,10 @@
 
 //#define INT8_MAX 32767
 
+/* Macroses */
+
+#define BUFFER_SHIFT(__VAR__) (buffer[__VAR__++] << 8) | buffer[__VAR__++]
+
 /* Service functions */
 
 char *MPU_Error2Str(MPU_Status_t status);
@@ -54,4 +58,5 @@ MPU_Status_t MPU_SetFIFO_Writing(MPU_Handle_I2C_t *handle);
 MPU_Status_t MPU_DumpFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[], uint16_t *size);
 MPU_Status_t MPU_GetFIFO_Size(MPU_Handle_I2C_t *handle, uint16_t *size);
 MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[]);
+MPU_Status_t MPU_ProcessFIFO_Data(MPU_Handle_I2C_t *handle, uint8_t buffer[], MPU_Measurement_t *data);
 MPU_Status_t MPU_ReadFIFO_Single(MPU_Handle_I2C_t *handle, uint8_t *value);

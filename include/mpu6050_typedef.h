@@ -43,6 +43,18 @@ typedef struct {
     MPU_ModuleState_t enable_fifo;
 } MPU_Handle_I2C_t;
 
+typedef struct {
+    int16_t accel_x;
+    int16_t accel_y;
+    int16_t accel_z;
+
+    int16_t gyro_x;
+    int16_t gyro_y;
+    int16_t gyro_z;
+
+    int16_t temp;
+} MPU_Measurement_t;
+
 typedef enum {
     WHO_AM_I = 0x75,
     ACCEL_XOUT_H = 0x3B,

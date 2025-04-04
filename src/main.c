@@ -6,7 +6,7 @@ UART_HandleTypeDef huart1;
 
 CLI_Context_t ctx;
 MPU_Handle_I2C_t mpu;
-uint8_t buffer[2];
+uint8_t buffer[6];
 uint16_t size;
 
 void loop(void);
@@ -59,5 +59,8 @@ void loop(void)
         printf("%s\n", MPU_Error2Str(status));
         CLI_Log(&ctx, __func__, "Error(");
     }
-    
+
+    MPU_Measurement_t data;
+    MPU_ProcessFIFO_Data(&mpu, buffer, &data);
+    printf("%d, %d, %d\n", data.accel_x, data.accel_y, data.accel_z);
 }
