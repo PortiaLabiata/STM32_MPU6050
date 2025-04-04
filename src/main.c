@@ -41,7 +41,6 @@ int main(void)
     MPU_Init(&mpu);
 
     MPU_SetClockSource(&mpu, MPU_CLKS_PLLX);
-    HAL_Delay(10);
     
     while (1) {
         status = CLI_RUN(&ctx, loop);

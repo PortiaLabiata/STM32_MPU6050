@@ -27,6 +27,7 @@ char *MPU_Error2Str(MPU_Status_t status)
 
 MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
 {
+    if (handle == NULL) return MPU_STATUS_ERROR;
     //CLI_Log(&ctx, __func__, "Initializing MPU6050.");
 #ifdef USE_CLI
     CLI_AddCommand(&ctx, "getreg", &getreg_Handler, "Usage: getreg <address>, reads value stored in address");
@@ -62,9 +63,11 @@ MPU_Status_t MPU_Init(MPU_Handle_I2C_t *handle)
 
 MPU_Status_t MPU_SetClockSource(MPU_Handle_I2C_t *handle, MPU_ClockSource_t clock)
 {
+    if (handle == NULL || (uint8_t)clock > (uint8_t)MPU_CLKS_DISABLE) return MPU_STATUS_ERROR;
     MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, PWR_MGMT_1, \
         clock | (handle->temp_enable << 3) | (handle->cycle << 5));
     if (status != MPU_STATUS_OK) return status;
+
     handle->clock_source = clock;
     return MPU_STATUS_OK;
 }
@@ -108,8 +111,10 @@ MPU_Status_t MPU_SetFIFO(MPU_Handle_I2C_t *handle, uint8_t enable)
  */
 MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle, uint8_t range)
 {
+    if (handle == NULL || range > 3) return MPU_STATUS_ERROR;
     MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, ACCEL_CONFIG, \
         range << 3);
+    
     if (status != MPU_STATUS_OK) return status;
     handle->acccel_range = range;
     return MPU_STATUS_OK;
@@ -130,6 +135,8 @@ MPU_Status_t MPU_SetAccelRange(MPU_Handle_I2C_t *handle, uint8_t range)
  */
 MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle, uint8_t range)
 {
+    if (handle == NULL || range > 3) return MPU_STATUS_ERROR;
+
     MPU_Status_t status = MPU_WriteRegister_I2C(handle->hi2c, GYRO_CONFIG, \
         range << 3);
     if (status != MPU_STATUS_OK) return status;
@@ -147,6 +154,8 @@ MPU_Status_t MPU_SetGyroRange(MPU_Handle_I2C_t *handle, uint8_t range)
  */
 MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -162,6 +171,8 @@ MPU_Status_t MPU_ReadAccelX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_YOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -177,6 +188,8 @@ MPU_Status_t MPU_ReadAccelY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadAccelZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_ZOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -195,6 +208,8 @@ MPU_Status_t MPU_ReadAccelZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
     int16_t *x, int16_t *y, int16_t *z)
 {
+    if (handle == NULL || x == NULL || y == NULL || z == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[6];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, ACCEL_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -214,6 +229,9 @@ MPU_Status_t MPU_ReadAccel_Raw(MPU_Handle_I2C_t *handle, \
  */
 MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -229,6 +247,8 @@ MPU_Status_t MPU_ReadGyroX_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_YOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -244,6 +264,8 @@ MPU_Status_t MPU_ReadGyroY_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
  */
 MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 {
+    if (handle == NULL || pData == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_ZOUT_H, 2, (uint8_t*)buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -262,6 +284,8 @@ MPU_Status_t MPU_ReadGyroZ_Raw(MPU_Handle_I2C_t *handle, int16_t *pData)
 MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, \
     int16_t *x, int16_t *y, int16_t *z)
 {
+    if (handle == NULL || x == NULL || y == NULL || z == NULL) return MPU_STATUS_ERROR;
+
     uint8_t buffer[6];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, GYRO_XOUT_H, 6, buffer);
     if (status != MPU_STATUS_OK) return status;
@@ -283,6 +307,7 @@ MPU_Status_t MPU_ReadGyro_Raw(MPU_Handle_I2C_t *handle, \
  */
 MPU_Status_t MPU_DumpFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[], uint16_t *size)
 {
+    if (handle == NULL || buffer == NULL || size == NULL) return MPU_STATUS_ERROR;
     MPU_Status_t status = MPU_GetFIFO_Size(handle, size);
     if (status != MPU_STATUS_OK) return status;
 
@@ -301,6 +326,7 @@ MPU_Status_t MPU_DumpFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[], uint16_t *
  */
 MPU_Status_t MPU_GetFIFO_Size(MPU_Handle_I2C_t *handle, uint16_t *size)
 {
+    if (handle == NULL || size == NULL) return MPU_STATUS_ERROR;
     uint8_t _size[2];
     MPU_Status_t status = MPU_ReadBytes_I2C(handle->hi2c, FIFO_COUNT_H, 2, _size);
     if (status != MPU_STATUS_OK) return status;
@@ -308,6 +334,7 @@ MPU_Status_t MPU_GetFIFO_Size(MPU_Handle_I2C_t *handle, uint16_t *size)
     return MPU_STATUS_OK;
 }
 
+/* Right now it doesn't work, but it's probably because the FIFO is overflowed very quickly */
 /**
  * \brief Reads data from FIFO buffer. The size of data read depends on which FIFO writings
  * are enabled.
@@ -345,11 +372,17 @@ MPU_Status_t MPU_ReadFIFO(MPU_Handle_I2C_t *handle, uint8_t buffer[])
 MPU_Status_t MPU_ProcessFIFO_Data(MPU_Handle_I2C_t *handle, uint8_t buffer[], \
     MPU_Measurement_t *data)
 {
+    if (handle == NULL || buffer == NULL || data == NULL) return MPU_STATUS_ERROR;
+
     uint16_t of = 0;
     if (handle->accel_fifo == MPU_ON) {
         data->accel_x = BUFFER_SHIFT(of);
         data->accel_z = BUFFER_SHIFT(of);
         data->accel_z = BUFFER_SHIFT(of);
+    }
+
+    if (handle->temp_fifo == MPU_ON) {
+        data->temp = BUFFER_SHIFT(of);
     }
 
     if (handle->gyrox_fifo == MPU_ON) {
@@ -362,9 +395,6 @@ MPU_Status_t MPU_ProcessFIFO_Data(MPU_Handle_I2C_t *handle, uint8_t buffer[], \
         data->gyro_z = BUFFER_SHIFT(of);
     }
 
-    if (handle->temp_fifo == MPU_ON) {
-        data->temp = BUFFER_SHIFT(of);
-    }
     return MPU_STATUS_OK;
 }
 
@@ -379,7 +409,8 @@ MPU_Status_t MPU_ReadFIFO_Single(MPU_Handle_I2C_t *handle, uint8_t *value)
     return MPU_ReadRegister_I2C(handle->hi2c, FIFO_R_W, value);
 }
 
-/* Low-level I2C functions */
+/* Low-level I2C functions. Error handling not added for better performance? */
+/* Is it a bad idea? */
 
 MPU_Status_t MPU_WriteRegister_I2C(I2C_HandleTypeDef *hi2c, \
     MPU_Register_t register_addr, uint8_t value)
